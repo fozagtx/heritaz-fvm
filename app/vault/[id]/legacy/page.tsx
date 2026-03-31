@@ -58,7 +58,7 @@ export default function LegacyDocumentsPage() {
           const { FVMVaultManager } = await import('@/lib/fvm-vault');
           const { ethers } = await import('ethers');
           const provider = new ethers.BrowserProvider(window.ethereum!);
-          const factoryAddress = process.env.NEXT_PUBLIC_FVM_FACTORY_ADDRESS || '';
+          const factoryAddress = process.env.NEXT_PUBLIC_FVM_FACTORY_ADDRESS || '0x6d4E608031Df82593acbF4CD54E85C0a8D79BC9e';
           const manager = new FVMVaultManager(provider, factoryAddress, signer);
 
           const keyShareBytes = shares.map(s => new TextEncoder().encode(s));
@@ -98,7 +98,7 @@ export default function LegacyDocumentsPage() {
         const { FVMVaultManager } = await import('@/lib/fvm-vault');
         const { ethers } = await import('ethers');
         const provider = new ethers.BrowserProvider(window.ethereum!);
-        const factoryAddress = process.env.NEXT_PUBLIC_FVM_FACTORY_ADDRESS || '';
+        const factoryAddress = process.env.NEXT_PUBLIC_FVM_FACTORY_ADDRESS || '0x6d4E608031Df82593acbF4CD54E85C0a8D79BC9e';
         const manager = new FVMVaultManager(provider, factoryAddress, signer);
         await manager.removeLegacyDocument(vaultId, index);
       } catch (err) {
