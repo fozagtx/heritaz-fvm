@@ -1,6 +1,7 @@
 'use client';
 
 import React, { ReactNode } from 'react';
+import { Web3Provider } from './web3Provider';
 import { BitcoinWalletProvider } from './bitcoinWalletProvider';
 import { FilecoinWalletProvider } from './filecoinWalletProvider';
 
@@ -8,16 +9,14 @@ interface WalletProviderProps {
   children: ReactNode;
 }
 
-/**
- * Unified wallet provider wrapping both Bitcoin and Filecoin wallet contexts.
- * Features gate on which wallet is connected.
- */
 export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   return (
     <BitcoinWalletProvider>
-      <FilecoinWalletProvider>
-        {children}
-      </FilecoinWalletProvider>
+      <Web3Provider>
+        <FilecoinWalletProvider>
+          {children}
+        </FilecoinWalletProvider>
+      </Web3Provider>
     </BitcoinWalletProvider>
   );
 };

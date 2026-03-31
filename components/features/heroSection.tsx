@@ -2,7 +2,7 @@
 
 import { Shield, Vault, ArrowRight, CheckCircle, Lock } from "lucide-react"
 import { useFilecoinWallet } from '@/components/providers/filecoinWalletProvider'
-import { toast } from 'sonner'
+import { useModal } from 'connectkit'
 
 interface HeroProps {
   eyebrow?: string
@@ -19,15 +19,11 @@ export function Hero({
   ctaLabel = "Secure My Legacy",
   ctaHref = "#",
 }: HeroProps) {
-  const { wallet, connectWallet, isLoading } = useFilecoinWallet()
+  const { wallet } = useFilecoinWallet()
+  const { setOpen: openConnectModal } = useModal()
 
-  const handleLaunchClick = async () => {
-    try {
-      await connectWallet()
-    } catch (error) {
-      toast.error('Failed to connect wallet')
-      console.error('Wallet connection error:', error)
-    }
+  const handleLaunchClick = () => {
+    openConnectModal(true)
   }
 
   return (
@@ -79,13 +75,11 @@ export function Hero({
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <button
                 onClick={handleLaunchClick}
-                disabled={wallet.isConnected || isLoading}
+                disabled={wallet.isConnected}
                 className="group bg-[#D6FF34] text-black rounded-full px-7 py-3.5 text-[13px] font-bold uppercase tracking-[0.96px] hover:opacity-80 transition-opacity disabled:opacity-50 inline-flex items-center justify-center gap-2"
               >
                 {wallet.isConnected
                   ? 'Accessing Vault...'
-                  : isLoading
-                  ? 'Connecting...'
                   : ctaLabel}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>

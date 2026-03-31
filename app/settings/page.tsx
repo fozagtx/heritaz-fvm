@@ -3,10 +3,14 @@
 import React from 'react';
 import { Header } from '@/components/layout/header';
 import { useFilecoinWallet } from '@/components/providers/filecoinWalletProvider';
+import { useModal } from 'connectkit';
+import { useDisconnect } from 'wagmi';
 import { Wallet, CheckCircle2 } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { wallet: filWallet, connectWallet: connectFil, disconnectWallet: disconnectFil } = useFilecoinWallet();
+  const { wallet: filWallet } = useFilecoinWallet();
+  const { setOpen: openConnectModal } = useModal();
+  const { disconnect } = useDisconnect();
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -45,7 +49,7 @@ export default function SettingsPage() {
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="w-4 h-4 text-green-400" />
                 <button
-                  onClick={disconnectFil}
+                  onClick={() => disconnect()}
                   className="text-xs text-red-400/60 hover:text-red-400"
                 >
                   Disconnect
@@ -53,10 +57,10 @@ export default function SettingsPage() {
               </div>
             ) : (
               <button
-                onClick={connectFil}
+                onClick={() => openConnectModal(true)}
                 className="bg-[#D6FF34] text-black rounded-full px-6 py-2 text-[13px] font-bold uppercase tracking-[0.96px]"
               >
-                Connect MetaMask
+                Connect
               </button>
             )}
           </div>

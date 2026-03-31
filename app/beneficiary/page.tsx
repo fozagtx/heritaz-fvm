@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Header } from '@/components/layout/header';
 import { useFilecoinWallet } from '@/components/providers/filecoinWalletProvider';
+import { useModal } from 'connectkit';
 import { Shield, ArrowRight, AlertTriangle, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -16,7 +17,8 @@ interface BeneficiaryVault {
 }
 
 export default function BeneficiaryPage() {
-  const { wallet: filWallet, initializing, connectWallet } = useFilecoinWallet();
+  const { wallet: filWallet, initializing } = useFilecoinWallet();
+  const { setOpen: openConnectModal } = useModal();
   const router = useRouter();
   const [vaults, setVaults] = useState<BeneficiaryVault[]>([]);
   const [loading, setLoading] = useState(false);
@@ -59,7 +61,7 @@ export default function BeneficiaryPage() {
           <Shield className="w-12 h-12 text-white/20" />
           <p className="text-white/50">Connect your wallet to view your claims</p>
           <button
-            onClick={connectWallet}
+            onClick={() => openConnectModal(true)}
             className="bg-[#D6FF34] text-black rounded-full px-7 py-3.5 text-[13px] font-bold uppercase tracking-[0.96px] hover:opacity-80"
           >
             Connect Wallet

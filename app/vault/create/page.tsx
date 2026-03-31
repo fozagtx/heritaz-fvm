@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Header } from '@/components/layout/header';
 import { useFilecoinWallet } from '@/components/providers/filecoinWalletProvider';
+import { useModal } from 'connectkit';
 import { Shield, Clock, Check, ArrowLeft, ArrowRight, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -19,7 +20,8 @@ const STEPS: Step[] = ['beneficiaries', 'timing', 'confirm'];
 
 export default function CreateVaultPage() {
   const router = useRouter();
-  const { wallet: filWallet, signer, initializing, connectWallet } = useFilecoinWallet();
+  const { wallet: filWallet, signer, initializing } = useFilecoinWallet();
+  const { setOpen: openConnectModal } = useModal();
 
   const [step, setStep] = useState<Step>('beneficiaries');
   const [beneficiaries, setBeneficiaries] = useState<BeneficiaryInput[]>([
@@ -124,7 +126,7 @@ export default function CreateVaultPage() {
           <Shield className="w-12 h-12 text-white/20" />
           <p className="text-white/50">Connect your wallet to create a vault</p>
           <button
-            onClick={connectWallet}
+            onClick={() => openConnectModal(true)}
             className="bg-[#D6FF34] text-black rounded-full px-7 py-3.5 text-[13px] font-bold uppercase tracking-[0.96px] hover:opacity-80"
           >
             Connect Wallet
