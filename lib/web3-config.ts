@@ -25,7 +25,7 @@ export const config = createConfig(
     transports: {
       [filecoinCalibration.id]: http('https://api.calibration.node.glif.io/rpc/v1'),
     },
-    walletConnectProjectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID || '',
+    walletConnectProjectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID || 'demo',
     appName: 'Heritaz',
     appDescription: 'Digital Legacy Platform on Filecoin',
   })

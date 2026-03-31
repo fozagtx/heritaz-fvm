@@ -14,6 +14,12 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <ConnectKitProvider
           theme="midnight"
+          options={{
+            hideNoWalletCTA: true,
+            hideQuestionMarkCTA: true,
+            hideRecentBadge: true,
+            enforceSupportedChains: true,
+          }}
           customTheme={{
             '--ck-font-family': '"Space Grotesk", sans-serif',
             '--ck-accent-color': '#D6FF34',

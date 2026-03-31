@@ -37,29 +37,7 @@ export function Header() {
           {/* Right - Wallet + Notifications */}
           <div className="flex items-center gap-3">
             {isConnected && <NotificationInbox />}
-            <ConnectKitButton.Custom>
-              {({ isConnected, isConnecting, show, address }) => (
-                <button
-                  onClick={show}
-                  className={
-                    isConnected
-                      ? "flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-[#D6FF34]/30 text-sm text-white/80 transition-colors"
-                      : "bg-[#D6FF34] text-black rounded-full px-7 py-3.5 text-[13px] font-bold uppercase tracking-[0.96px] hover:opacity-80 transition-opacity"
-                  }
-                >
-                  {isConnecting ? (
-                    'Connecting...'
-                  ) : isConnected ? (
-                    <>
-                      <span className="text-[#D6FF34]">⬡</span>
-                      <span>{address?.slice(0, 6)}...{address?.slice(-4)}</span>
-                    </>
-                  ) : (
-                    'Connect Wallet'
-                  )}
-                </button>
-              )}
-            </ConnectKitButton.Custom>
+            <ConnectKitButton />
           </div>
         </div>
       </div>
