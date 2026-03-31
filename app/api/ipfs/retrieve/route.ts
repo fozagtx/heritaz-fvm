@@ -1,8 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { readFile } from 'fs/promises';
+import { existsSync } from 'fs';
+import path from 'path';
+
+const STORAGE_DIR = path.join(process.cwd(), '.ipfs-data');
+
+// Public IPFS gateways to try in order
+const GATEWAYS = [
+  'https://w3s.link/ipfs/',
+  'https://dweb.link/ipfs/',
+  'https://cloudflare-ipfs.com/ipfs/',
+];
 
 /**
- * Server proxy for IPFS retrieval
- * Fetches content from IPFS gateways by CID
+ * IPFS retrieval API route
+ *
+ * 1. Check local content-addressed store first
+ * 2. If not local, try public IPFS gateways
+ * 3. Returns raw binary data
  */
 export async function GET(request: NextRequest) {
   try {
@@ -17,28 +32,60 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Check local store first
+    const localPath = path.join(STORAGE_DIR, cid);
+    const isLocal = existsSync(localPath);
+
     if (checkOnly) {
-      // Just check if the CID is accessible
       return NextResponse.json({
         success: true,
-        stored: true,
+        stored: isLocal,
         filecoinDeal: false,
         cid,
       });
     }
 
-    // In production: fetch from IPFS gateway or Storacha
-    // const gatewayUrl = `https://${cid}.ipfs.w3s.link`;
-    // const response = await fetch(gatewayUrl);
-    // const data = await response.arrayBuffer();
+    // Serve from local store
+    if (isLocal) {
+      const data = await readFile(localPath);
+      return new NextResponse(data, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/octet-stream',
+          'Content-Length': data.byteLength.toString(),
+          'X-Storage': 'local',
+        },
+      });
+    }
 
-    // For development: return mock data
-    return NextResponse.json({
-      success: true,
-      cid,
-      message: 'Configure IPFS gateway for production retrieval',
-      note: 'Use w3s.link or dweb.link gateways for Storacha-stored content',
-    });
+    // Try public IPFS gateways
+    for (const gateway of GATEWAYS) {
+      try {
+        const response = await fetch(`${gateway}${cid}`, {
+          signal: AbortSignal.timeout(10000),
+        });
+
+        if (response.ok) {
+          const data = await response.arrayBuffer();
+          return new NextResponse(Buffer.from(data), {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/octet-stream',
+              'Content-Length': data.byteLength.toString(),
+              'X-Storage': 'ipfs-gateway',
+              'X-Gateway': gateway,
+            },
+          });
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    return NextResponse.json(
+      { success: false, message: `Document ${cid} not found in local store or IPFS gateways` },
+      { status: 404 }
+    );
   } catch (error) {
     console.error('IPFS retrieval error:', error);
     return NextResponse.json(

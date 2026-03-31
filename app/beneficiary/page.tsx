@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/header';
 import { useFilecoinWallet } from '@/components/providers/filecoinWalletProvider';
 import { Shield, ArrowRight, AlertTriangle, Clock } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface BeneficiaryVault {
   address: string;
@@ -16,11 +17,15 @@ interface BeneficiaryVault {
 
 export default function BeneficiaryPage() {
   const { wallet: filWallet } = useFilecoinWallet();
+  const router = useRouter();
   const [vaults, setVaults] = useState<BeneficiaryVault[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!filWallet.isConnected) return;
+    if (!filWallet.isConnected) {
+      router.replace('/');
+      return;
+    }
 
     const fetchBeneficiaryVaults = async () => {
       setLoading(true);

@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { Header } from '@/components/layout/header';
-import { useBitcoinWallet } from '@/components/providers/bitcoinWalletProvider';
 import { useFilecoinWallet } from '@/components/providers/filecoinWalletProvider';
 import { Shield, Clock, FileText, Plus, ArrowRight, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface VaultSummary {
   id: string;
@@ -18,15 +18,22 @@ interface VaultSummary {
 }
 
 export default function DashboardPage() {
-  const { wallet: btcWallet } = useBitcoinWallet();
   const { wallet: filWallet } = useFilecoinWallet();
+  const router = useRouter();
   const [vaults, setVaults] = useState<VaultSummary[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const isAnyWalletConnected = filWallet.isConnected;
+  const isConnected = filWallet.isConnected;
 
   useEffect(() => {
-    if (!isAnyWalletConnected) return;
+    if (!isConnected) {
+      router.replace('/');
+      return;
+    }
+  }, [isConnected, router]);
+
+  useEffect(() => {
+    if (!isConnected) return;
 
     const fetchVaults = async () => {
       setLoading(true);
@@ -69,7 +76,7 @@ export default function DashboardPage() {
     };
 
     fetchVaults();
-  }, [filWallet.isConnected, filWallet.address, isAnyWalletConnected]);
+  }, [filWallet.isConnected, filWallet.address, isConnected]);
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -151,7 +158,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Vault List */}
-        {!isAnyWalletConnected ? (
+        {!isConnected ? (
           <div className="text-center py-20">
             <Shield className="w-16 h-16 text-white/20 mx-auto mb-4" />
             <h2 className="text-xl font-medium text-white/60 mb-2">Connect a wallet to get started</h2>

@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { Header } from '@/components/layout/header';
 import { useFilecoinWallet } from '@/components/providers/filecoinWalletProvider';
-import { FileText, Upload, Trash2, ArrowLeft, Lock, ExternalLink } from 'lucide-react';
+import { FileText, Upload, Trash2, ArrowLeft, Lock, ExternalLink, Copy } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
@@ -80,7 +80,7 @@ export default function LegacyDocumentsPage() {
       };
 
       setDocuments(prev => [...prev, newDoc]);
-      toast.success(`Document encrypted and uploaded. CID: ${uploadResult.cid.slice(0, 20)}...`);
+      toast.success('Document encrypted and uploaded successfully');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Upload failed');
     } finally {
@@ -193,22 +193,35 @@ export default function LegacyDocumentsPage() {
                 key={doc.cid}
                 className="flex items-center justify-between bg-surface-2 rounded-[16px] p-5"
               >
-                <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-[#0090FF]" />
-                  <div>
+                <div className="flex items-center gap-3 min-w-0">
+                  <FileText className="w-5 h-5 text-card-blue flex-shrink-0" />
+                  <div className="min-w-0">
                     <p className="text-sm font-medium text-white">{doc.name}</p>
-                    <p className="font-mono text-xs text-white/45">{doc.cid.slice(0, 30)}...</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-mono text-xs text-[#D6FF34] truncate">{doc.cid}</p>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(doc.cid);
+                          toast.success('CID copied to clipboard');
+                        }}
+                        className="flex-shrink-0 text-white/30 hover:text-[#D6FF34] transition-colors"
+                        title="Copy CID"
+                      >
+                        <Copy className="w-3 h-3" />
+                      </button>
+                    </div>
                     <p className="text-xs text-white/45">
                       {formatSize(doc.size)} · {new Date(doc.timestamp).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-shrink-0">
                   <a
                     href={`https://w3s.link/ipfs/${doc.cid}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg text-white/40 hover:text-white/60 transition-colors"
+                    className="p-2 rounded-lg text-white/40 hover:text-[#D6FF34] transition-colors"
                     title="View on IPFS gateway"
                   >
                     <ExternalLink className="w-4 h-4" />

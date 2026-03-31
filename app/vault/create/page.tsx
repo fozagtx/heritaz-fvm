@@ -22,6 +22,10 @@ export default function CreateVaultPage() {
   const router = useRouter();
   const { wallet: filWallet, signer } = useFilecoinWallet();
 
+  React.useEffect(() => {
+    if (!filWallet.isConnected) router.replace('/');
+  }, [filWallet.isConnected, router]);
+
   const [step, setStep] = useState<Step>('type');
   const [vaultType, setVaultType] = useState<VaultType>(null);
   const [beneficiaries, setBeneficiaries] = useState<BeneficiaryInput[]>([
