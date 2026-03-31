@@ -1,19 +1,12 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Header } from '@/components/layout/header';
 import { useFilecoinWallet } from '@/components/providers/filecoinWalletProvider';
-import { Settings, Wallet, CheckCircle2, XCircle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { Wallet, CheckCircle2 } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { wallet: filWallet, connectWallet: connectFil, disconnectWallet: disconnectFil, initializing } = useFilecoinWallet();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (initializing) return;
-    if (!filWallet.isConnected) router.replace('/');
-  }, [filWallet.isConnected, initializing, router]);
+  const { wallet: filWallet, connectWallet: connectFil, disconnectWallet: disconnectFil } = useFilecoinWallet();
 
   return (
     <div className="min-h-screen bg-black text-white">

@@ -18,20 +18,12 @@ interface VaultSummary {
 }
 
 export default function DashboardPage() {
-  const { wallet: filWallet, initializing } = useFilecoinWallet();
+  const { wallet: filWallet, initializing, connectWallet } = useFilecoinWallet();
   const router = useRouter();
   const [vaults, setVaults] = useState<VaultSummary[]>([]);
   const [loading, setLoading] = useState(false);
 
   const isConnected = filWallet.isConnected;
-
-  useEffect(() => {
-    if (initializing) return;
-    if (!isConnected) {
-      router.replace('/');
-      return;
-    }
-  }, [isConnected, initializing, router]);
 
   useEffect(() => {
     if (initializing || !isConnected) return;
@@ -88,6 +80,35 @@ export default function DashboardPage() {
       default: return 'text-white/60 bg-white/5 border-white/10';
     }
   };
+
+  if (initializing) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <Header />
+        <div className="flex items-center justify-center pt-48">
+          <div className="w-6 h-6 border-2 border-[#D6FF34] border-t-transparent rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isConnected) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <Header />
+        <div className="flex flex-col items-center justify-center pt-48 space-y-4">
+          <Shield className="w-12 h-12 text-white/20" />
+          <p className="text-white/50">Connect your wallet to view your dashboard</p>
+          <button
+            onClick={connectWallet}
+            className="bg-[#D6FF34] text-black rounded-full px-7 py-3.5 text-[13px] font-bold uppercase tracking-[0.96px] hover:opacity-80"
+          >
+            Connect Wallet
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
