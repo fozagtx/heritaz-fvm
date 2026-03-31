@@ -17,59 +17,16 @@ interface WalletOption {
 interface WalletModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onBitcoinWalletSelect: (walletId: 'unisat' | 'leather' | 'xverse' | 'okx') => Promise<void>
+  onBitcoinWalletSelect?: (walletId: 'unisat' | 'leather' | 'xverse' | 'okx') => Promise<void>
   onFilecoinConnect: () => Promise<void>
   onWalletSelect?: (walletId: 'unisat' | 'leather' | 'xverse' | 'okx') => Promise<void>
 }
 
-type Tab = 'filecoin' | 'bitcoin'
-
-export function WalletModal({ open, onOpenChange, onBitcoinWalletSelect, onFilecoinConnect, onWalletSelect }: WalletModalProps) {
+export function WalletModal({ open, onOpenChange, onFilecoinConnect }: WalletModalProps) {
   const [isConnecting, setIsConnecting] = React.useState(false)
   const [selectedWallet, setSelectedWallet] = React.useState<string | null>(null)
-  const [activeTab, setActiveTab] = React.useState<Tab>('filecoin')
 
-  const handleBtcSelect = onBitcoinWalletSelect || onWalletSelect
-
-  const bitcoinWallets: WalletOption[] = React.useMemo(() => {
-    if (typeof window === 'undefined') return []
-    return [
-      {
-        id: 'unisat',
-        name: 'Unisat',
-        description: 'Popular Bitcoin wallet with ordinals support',
-        icon: '🟠',
-        installUrl: 'https://unisat.io',
-        isInstalled: !!(window as any).unisat,
-      },
-      {
-        id: 'leather',
-        name: 'Leather',
-        description: 'Stacks & Bitcoin wallet by Hiro',
-        icon: '🔶',
-        installUrl: 'https://leather.io',
-        isInstalled: !!(window as any).LeatherProvider || !!(window as any).HiroWalletProvider,
-      },
-      {
-        id: 'xverse',
-        name: 'Xverse',
-        description: 'Bitcoin, Ordinals & Stacks wallet',
-        icon: '💜',
-        installUrl: 'https://www.xverse.app/',
-        isInstalled: !!(window as any).xverse || !!(window as any).XverseProviders,
-      },
-      {
-        id: 'okx',
-        name: 'OKX Wallet',
-        description: 'Multi-chain wallet by OKX',
-        icon: '⚫',
-        installUrl: 'https://www.okx.com/web3',
-        isInstalled: !!(window as any).okxwallet?.bitcoin,
-      },
-    ]
-  }, [])
-
-  const filecoinWallets: WalletOption[] = React.useMemo(() => {
+  const wallets: WalletOption[] = React.useMemo(() => {
     if (typeof window === 'undefined') return []
     return [
       {
@@ -83,30 +40,7 @@ export function WalletModal({ open, onOpenChange, onBitcoinWalletSelect, onFilec
     ]
   }, [])
 
-  const handleBitcoinClick = async (wallet: WalletOption) => {
-    if (!wallet.isInstalled) {
-      toast.info(`${wallet.name} not detected. Opening installation page...`)
-      window.open(wallet.installUrl, '_blank')
-      return
-    }
-
-    setIsConnecting(true)
-    setSelectedWallet(wallet.id)
-
-    try {
-      if (handleBtcSelect) {
-        await handleBtcSelect(wallet.id as 'unisat' | 'leather' | 'xverse' | 'okx')
-      }
-      onOpenChange(false)
-    } catch (error) {
-      console.error('Wallet connection failed:', error)
-    } finally {
-      setIsConnecting(false)
-      setSelectedWallet(null)
-    }
-  }
-
-  const handleFilecoinClick = async (wallet: WalletOption) => {
+  const handleClick = async (wallet: WalletOption) => {
     if (!wallet.isInstalled) {
       toast.info(`${wallet.name} not detected. Opening installation page...`)
       window.open(wallet.installUrl, '_blank')
@@ -127,9 +61,6 @@ export function WalletModal({ open, onOpenChange, onBitcoinWalletSelect, onFilec
     }
   }
 
-  const currentWallets = activeTab === 'bitcoin' ? bitcoinWallets : filecoinWallets
-  const handleClick = activeTab === 'bitcoin' ? handleBitcoinClick : handleFilecoinClick
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-surface-1 border-white/10">
@@ -141,36 +72,12 @@ export function WalletModal({ open, onOpenChange, onBitcoinWalletSelect, onFilec
             </span>
           </DialogTitle>
           <DialogDescription className="text-white/45">
-            Connect your wallet to use Heritaz
+            Connect MetaMask to Filecoin Calibration
           </DialogDescription>
         </DialogHeader>
 
-        {/* Tabs */}
-        <div className="flex gap-1 p-1 rounded-[12px] bg-surface-2 border border-white/10">
-          <button
-            onClick={() => setActiveTab('filecoin')}
-            className={`flex-1 px-4 py-2 rounded-[8px] text-[13px] font-bold uppercase tracking-[0.96px] transition-colors ${
-              activeTab === 'filecoin'
-                ? 'bg-[#D6FF34] text-black'
-                : 'text-white/60 hover:text-white'
-            }`}
-          >
-            Filecoin
-          </button>
-          <button
-            onClick={() => setActiveTab('bitcoin')}
-            className={`flex-1 px-4 py-2 rounded-[8px] text-[13px] font-bold uppercase tracking-[0.96px] transition-colors ${
-              activeTab === 'bitcoin'
-                ? 'bg-[#D6FF34] text-black'
-                : 'text-white/60 hover:text-white'
-            }`}
-          >
-            Bitcoin
-          </button>
-        </div>
-
         <div className="grid gap-3 py-4">
-          {currentWallets.map((wallet) => (
+          {wallets.map((wallet) => (
             <button
               key={wallet.id}
               onClick={() => handleClick(wallet)}
