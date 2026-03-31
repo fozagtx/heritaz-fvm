@@ -58,25 +58,25 @@ const Homepage: FC = () => {
           <HowItWorks />
           <Features />
 
-          <footer className="!bg-black mt-20 pt-16 border-t border-white/10" style={{backgroundColor: '#000000 !important'}}>
+          <footer className="bg-surface-1 rounded-t-[120px] mt-20 pt-20">
             <div className="max-w-6xl mx-auto px-6 py-12">
               <div className="text-center">
                 <div className="flex items-center justify-center gap-3 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-r from-[#F7931A] to-orange-500 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-[#D6FF34] rounded-full flex items-center justify-center">
                     <span className="text-black font-bold text-sm">H</span>
                   </div>
                   <span className="text-xl font-bold text-white">Heritaz</span>
                 </div>
-                <p className="text-gray-400 text-sm mb-6">
-                  Secure digital inheritance for the modern age
+                <p className="text-white/45 text-sm mb-6">
+                  Secure digital inheritance on Filecoin
                 </p>
                 <div className="flex justify-center space-x-6 text-sm">
-                  <a href="https://twitter.com/zanbuilds" className="text-gray-400 hover:text-[#F7931A] transition-colors duration-300">
+                  <a href="https://twitter.com/zanbuilds" className="text-white/45 hover:text-[#D6FF34] transition-colors duration-300">
                     @zanbuilds
                   </a>
                 </div>
                 <div className="mt-8 pt-8 border-t border-white/10">
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-white/30">
                     © 2025 Heritaz.
                   </p>
                 </div>

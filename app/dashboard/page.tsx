@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 interface VaultSummary {
   id: string;
-  type: 'bitcoin' | 'filecoin';
+  type: 'filecoin';
   status: string;
   deadline?: number;
   beneficiaryCount: number;
@@ -23,7 +23,7 @@ export default function DashboardPage() {
   const [vaults, setVaults] = useState<VaultSummary[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const isAnyWalletConnected = btcWallet.isConnected || filWallet.isConnected;
+  const isAnyWalletConnected = filWallet.isConnected;
 
   useEffect(() => {
     if (!isAnyWalletConnected) return;
@@ -69,7 +69,7 @@ export default function DashboardPage() {
     };
 
     fetchVaults();
-  }, [btcWallet.isConnected, btcWallet.address, filWallet.isConnected, filWallet.address, isAnyWalletConnected]);
+  }, [filWallet.isConnected, filWallet.address, isAnyWalletConnected]);
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -82,33 +82,31 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black text-white">
+    <div className="min-h-screen bg-black text-white">
       <Header />
 
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 -left-10 h-64 w-64 rounded-full bg-[#F7931A]/10 blur-3xl" />
-        <div className="absolute top-10 right-0 h-72 w-72 rounded-full bg-[#0090FF]/5 blur-3xl" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#D6FF34]/20 rounded-full blur-[120px] pointer-events-none" />
       </div>
 
       <div className="relative max-w-6xl mx-auto px-6 pt-32 pb-14 space-y-8">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div className="space-y-3">
-            <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#F7931A]">
-              <span className="h-[1px] w-8 bg-[#F7931A]/60" />
+            <p className="text-[13px] font-bold uppercase tracking-[1.2px] text-[#D6FF34]">
               Dashboard
             </p>
-            <h1 className="text-4xl lg:text-5xl font-semibold text-white leading-tight">
+            <h1 className="text-4xl lg:text-5xl font-bold uppercase text-white leading-tight">
               Vault Dashboard
             </h1>
             <p className="text-lg text-gray-300 max-w-2xl">
-              Manage your inheritance vaults across Bitcoin and Filecoin networks.
+              Manage your inheritance vaults on Filecoin.
             </p>
           </div>
 
           <Link
             href="/vault/create"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#F7931A] to-orange-600 text-white font-medium hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 bg-[#D6FF34] text-black rounded-full px-7 py-3.5 text-[13px] font-bold uppercase tracking-[0.96px] hover:opacity-80 transition-opacity"
           >
             <Plus className="w-5 h-5" />
             Create Vault
@@ -116,23 +114,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Wallet Status */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className={`p-4 rounded-xl border ${btcWallet.isConnected ? 'border-[#F7931A]/30 bg-[#F7931A]/5' : 'border-white/10 bg-white/5'}`}>
-            <div className="flex items-center gap-3">
-              <div className="text-2xl">₿</div>
-              <div>
-                <p className="text-sm font-medium text-white">Bitcoin {btcWallet.isConnected ? '' : '(Not Connected)'}</p>
-                {btcWallet.isConnected ? (
-                  <p className="text-xs text-white/60 font-mono">{btcWallet.address.slice(0, 12)}...{btcWallet.address.slice(-6)}</p>
-                ) : (
-                  <p className="text-xs text-white/40">Connect to view Bitcoin vaults</p>
-                )}
-              </div>
-              {btcWallet.isConnected && <CheckCircle2 className="w-4 h-4 text-green-400 ml-auto" />}
-            </div>
-          </div>
-
-          <div className={`p-4 rounded-xl border ${filWallet.isConnected ? 'border-[#0090FF]/30 bg-[#0090FF]/5' : 'border-white/10 bg-white/5'}`}>
+        <div className="grid grid-cols-1 gap-4">
+          <div className={`bg-surface-1 rounded-[30px] p-6 ${filWallet.isConnected ? 'border border-[#D6FF34]/30' : ''}`}>
             <div className="flex items-center gap-3">
               <div className="text-2xl">⬡</div>
               <div>
@@ -146,7 +129,7 @@ export default function DashboardPage() {
                   <p className="text-xs text-white/40">Connect MetaMask for FVM vaults</p>
                 )}
               </div>
-              {filWallet.isConnected && <CheckCircle2 className="w-4 h-4 text-green-400 ml-auto" />}
+              {filWallet.isConnected && <CheckCircle2 className="w-4 h-4 text-[#D6FF34] ml-auto" />}
             </div>
           </div>
         </div>
@@ -159,10 +142,10 @@ export default function DashboardPage() {
             { label: 'Needs Attention', value: vaults.filter(v => ['GracePeriod', 'Triggered'].includes(v.status)).length, icon: AlertTriangle },
             { label: 'Documents', value: vaults.reduce((sum, v) => sum + (v.documentCount || 0), 0), icon: FileText },
           ].map((stat) => (
-            <div key={stat.label} className="p-4 rounded-xl border border-white/10 bg-white/5">
+            <div key={stat.label} className="bg-surface-1 rounded-[20px] p-6 border-t-[3px] border-[#D6FF34]">
               <stat.icon className="w-5 h-5 text-white/40 mb-2" />
-              <p className="text-2xl font-semibold text-white">{stat.value}</p>
-              <p className="text-xs text-white/60">{stat.label}</p>
+              <p className="text-[40px] font-bold text-[#D6FF34]">{stat.value}</p>
+              <p className="text-[11px] font-bold uppercase tracking-[1.2px] text-white/45">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -172,11 +155,11 @@ export default function DashboardPage() {
           <div className="text-center py-20">
             <Shield className="w-16 h-16 text-white/20 mx-auto mb-4" />
             <h2 className="text-xl font-medium text-white/60 mb-2">Connect a wallet to get started</h2>
-            <p className="text-sm text-white/40">Connect your Bitcoin or Filecoin wallet to view and manage your vaults.</p>
+            <p className="text-sm text-white/40">Connect your Filecoin wallet to view and manage your vaults.</p>
           </div>
         ) : loading ? (
           <div className="text-center py-20">
-            <div className="w-8 h-8 border-2 border-[#F7931A] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="w-8 h-8 border-2 border-[#D6FF34] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-white/60">Loading vaults...</p>
           </div>
         ) : vaults.length === 0 ? (
@@ -186,7 +169,7 @@ export default function DashboardPage() {
             <p className="text-sm text-white/40 mb-6">Create your first inheritance vault to protect your digital legacy.</p>
             <Link
               href="/vault/create"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#F7931A] to-orange-600 text-white font-medium"
+              className="inline-flex items-center gap-2 bg-[#D6FF34] text-black rounded-full px-7 py-3.5 text-[13px] font-bold uppercase tracking-[0.96px] hover:opacity-80 transition-opacity"
             >
               <Plus className="w-5 h-5" />
               Create Your First Vault
@@ -198,17 +181,17 @@ export default function DashboardPage() {
             {vaults.map((vault) => (
               <Link
                 key={vault.id}
-                href={vault.type === 'filecoin' ? `/vault/${vault.address}` : `/vault/${vault.id}`}
-                className="block p-5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all group"
+                href={`/vault/${vault.address}`}
+                className="block bg-surface-1 rounded-[30px] p-5 hover:bg-surface-2 transition-all group"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className={`text-xl ${vault.type === 'bitcoin' ? 'text-[#F7931A]' : 'text-[#0090FF]'}`}>
-                      {vault.type === 'bitcoin' ? '₿' : '⬡'}
+                    <div className="text-xl text-[#D6FF34]">
+                      ⬡
                     </div>
                     <div>
                       <p className="font-medium text-white">{vault.id.slice(0, 16)}...</p>
-                      <p className="text-xs text-white/40 capitalize">{vault.type} vault</p>
+                      <p className="text-xs text-white/40 capitalize">Filecoin vault</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">

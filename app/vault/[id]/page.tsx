@@ -94,6 +94,15 @@ export default function VaultDetailPage() {
     }
   };
 
+  const getStatusBorderColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'active': return 'border-t-green-400';
+      case 'graceperiod': return 'border-t-yellow-400';
+      case 'triggered': return 'border-t-red-400';
+      default: return 'border-t-white/20';
+    }
+  };
+
   const formatTimestamp = (ts: number) => {
     if (!ts) return 'N/A';
     return new Date(ts * 1000).toLocaleString();
@@ -107,7 +116,7 @@ export default function VaultDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black text-white">
+    <div className="min-h-screen bg-black text-white">
       <Header />
 
       <div className="relative max-w-4xl mx-auto px-6 pt-32 pb-14 space-y-8">
@@ -118,13 +127,13 @@ export default function VaultDetailPage() {
 
         {loading ? (
           <div className="text-center py-20">
-            <div className="w-8 h-8 border-2 border-[#F7931A] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="w-8 h-8 border-2 border-[#D6FF34] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-white/60">Loading vault...</p>
           </div>
         ) : !vault ? (
           <div className="text-center py-20">
             <Shield className="w-16 h-16 text-white/20 mx-auto mb-4" />
-            <h2 className="text-xl font-medium text-white/60">Vault not found</h2>
+            <h2 className="text-xl font-bold uppercase text-white/60">Vault not found</h2>
           </div>
         ) : (
           <>
@@ -133,19 +142,19 @@ export default function VaultDetailPage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   {getStatusIcon(vault.statusLabel)}
-                  <h1 className="text-2xl font-semibold">Vault Details</h1>
+                  <h1 className="text-2xl font-bold uppercase">Vault Details</h1>
                 </div>
-                <p className="text-xs text-white/40 font-mono">{vault.address}</p>
+                <p className="font-mono text-xs text-white/45">{vault.address}</p>
               </div>
 
               {vault.statusLabel === 'Active' && filWallet.isConnected && vault.owner === filWallet.address && (
                 <button
                   onClick={handleCheckIn}
                   disabled={checkingIn}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white font-medium hover:opacity-90 disabled:opacity-50"
+                  className="inline-flex items-center gap-2 bg-[#D6FF34] text-black rounded-full px-7 py-3.5 text-[13px] font-bold uppercase tracking-[0.96px] hover:opacity-80 disabled:opacity-50"
                 >
                   {checkingIn ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <CheckCircle2 className="w-4 h-4" />
                   )}
@@ -156,55 +165,49 @@ export default function VaultDetailPage() {
 
             {/* Status + Timing */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`bg-surface-1 rounded-[20px] p-6 border-t-2 ${getStatusBorderColor(vault.statusLabel)}`}>
                 <Shield className="w-5 h-5 text-white/40 mb-2" />
                 <p className="text-lg font-semibold text-white">{vault.statusLabel}</p>
-                <p className="text-xs text-white/40">Vault Status</p>
+                <p className="text-[11px] font-bold uppercase tracking-[1.2px] text-white/45">Vault Status</p>
               </div>
-              <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`bg-surface-1 rounded-[20px] p-6 border-t-2 ${getStatusBorderColor(vault.statusLabel)}`}>
                 <Clock className="w-5 h-5 text-white/40 mb-2" />
                 <p className="text-lg font-semibold text-white">{formatDuration(vault.checkInInterval)}</p>
-                <p className="text-xs text-white/40">Check-in Interval</p>
+                <p className="text-[11px] font-bold uppercase tracking-[1.2px] text-white/45">Check-in Interval</p>
               </div>
-              <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`bg-surface-1 rounded-[20px] p-6 border-t-2 ${getStatusBorderColor(vault.statusLabel)}`}>
                 <Users className="w-5 h-5 text-white/40 mb-2" />
                 <p className="text-lg font-semibold text-white">{vault.beneficiaryCount}</p>
-                <p className="text-xs text-white/40">Beneficiaries</p>
+                <p className="text-[11px] font-bold uppercase tracking-[1.2px] text-white/45">Beneficiaries</p>
               </div>
             </div>
 
             {/* Details */}
-            <div className="p-6 rounded-2xl border border-white/10 bg-white/5 space-y-4">
-              <h2 className="text-lg font-medium">Vault Information</h2>
+            <div className="bg-surface-1 rounded-[30px] p-10 space-y-4">
+              <h2 className="text-lg font-bold uppercase">Vault Information</h2>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-white/60">Owner</span>
-                  <span className="text-white font-mono text-xs">{vault.owner}</span>
+                  <span className="text-[11px] font-bold uppercase tracking-[1.2px] text-white/45">Owner</span>
+                  <span className="font-mono text-xs text-white/45">{vault.owner}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/60">Last Check-in</span>
+                  <span className="text-[11px] font-bold uppercase tracking-[1.2px] text-white/45">Last Check-in</span>
                   <span className="text-white">{formatTimestamp(vault.lastCheckIn)}</span>
                 </div>
                 {vault.deadline > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-white/60">Next Deadline</span>
+                    <span className="text-[11px] font-bold uppercase tracking-[1.2px] text-white/45">Next Deadline</span>
                     <span className={vault.isExpired ? 'text-red-400' : 'text-white'}>{formatTimestamp(vault.deadline)}</span>
                   </div>
                 )}
                 {vault.gracePeriod > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-white/60">Grace Period</span>
+                    <span className="text-[11px] font-bold uppercase tracking-[1.2px] text-white/45">Grace Period</span>
                     <span className="text-white">{formatDuration(vault.gracePeriod)}</span>
                   </div>
                 )}
-                {vault.btcVaultId && (
-                  <div className="flex justify-between">
-                    <span className="text-white/60">Bitcoin Vault ID</span>
-                    <span className="text-white font-mono text-xs">{vault.btcVaultId}</span>
-                  </div>
-                )}
                 <div className="flex justify-between">
-                  <span className="text-white/60">Legacy Documents</span>
+                  <span className="text-[11px] font-bold uppercase tracking-[1.2px] text-white/45">Legacy Documents</span>
                   <span className="text-white">{vault.documentCount}</span>
                 </div>
               </div>
@@ -214,7 +217,7 @@ export default function VaultDetailPage() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href={`/vault/${vaultId}/legacy`}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-sm text-white/60 hover:text-white hover:border-white/20"
+                className="inline-flex items-center gap-2 bg-surface-2 rounded-full px-6 py-2.5 text-[13px] font-bold uppercase tracking-[0.96px] text-text-primary hover:opacity-80"
               >
                 <FileText className="w-4 h-4" />
                 Manage Documents

@@ -137,7 +137,7 @@ export default function ClaimPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black text-white">
+    <div className="min-h-screen bg-black text-white">
       <Header />
 
       <div className="relative max-w-3xl mx-auto px-6 pt-32 pb-14 space-y-8">
@@ -147,7 +147,7 @@ export default function ClaimPage() {
         </Link>
 
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold">Claim Inheritance</h1>
+          <h1 className="text-3xl font-bold uppercase">Claim Inheritance</h1>
           <p className="text-xs text-white/40 font-mono">{vaultId}</p>
         </div>
 
@@ -155,9 +155,9 @@ export default function ClaimPage() {
         <div className="flex items-center gap-2 text-xs">
           {(['verify', 'retrieve', 'decrypt', 'complete'] as ClaimStep[]).map((s, i) => (
             <React.Fragment key={s}>
-              <div className={`px-3 py-1.5 rounded-lg border ${
+              <div className={`px-3 py-1.5 rounded-[12px] border ${
                 s === step
-                  ? 'bg-[#0090FF]/20 text-[#0090FF] border-[#0090FF]/30'
+                  ? 'bg-[#D6FF34]/20 text-[#D6FF34] border-[#D6FF34]/30'
                   : ['verify', 'retrieve', 'decrypt', 'complete'].indexOf(step) > i
                     ? 'bg-green-400/10 text-green-400 border-green-400/20'
                     : 'bg-white/5 text-white/40 border-white/10'
@@ -171,11 +171,11 @@ export default function ClaimPage() {
         </div>
 
         {/* Content */}
-        <div className="p-6 rounded-2xl border border-white/10 bg-white/5 space-y-6">
+        <div className="bg-surface-1 rounded-[30px] p-10 space-y-6">
           {step === 'verify' && (
             <>
               <div className="flex items-center gap-3 mb-4">
-                <Shield className="w-6 h-6 text-[#0090FF]" />
+                <Shield className="w-6 h-6 text-[#D6FF34]" />
                 <h2 className="text-lg font-medium">Verify & Claim</h2>
               </div>
               <p className="text-sm text-white/60">
@@ -189,10 +189,10 @@ export default function ClaimPage() {
                 <button
                   onClick={handleClaim}
                   disabled={claiming}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#0090FF] to-blue-600 text-white font-medium hover:opacity-90 disabled:opacity-50"
+                  className="inline-flex items-center gap-2 bg-[#D6FF34] text-black rounded-full px-7 py-3.5 text-[13px] font-bold uppercase tracking-[0.96px] hover:opacity-90 disabled:opacity-50"
                 >
                   {claiming ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-[#D6FF34] border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <Key className="w-4 h-4" />
                   )}
@@ -205,11 +205,11 @@ export default function ClaimPage() {
           {step === 'retrieve' && (
             <>
               <div className="flex items-center gap-3">
-                <Key className="w-6 h-6 text-[#0090FF]" />
+                <Key className="w-6 h-6 text-[#D6FF34]" />
                 <h2 className="text-lg font-medium">Retrieving Key Shares</h2>
               </div>
               <div className="text-center py-8">
-                <div className="w-8 h-8 border-2 border-[#0090FF] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <div className="w-8 h-8 border-2 border-[#D6FF34] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                 <p className="text-white/60 text-sm">Retrieving your encrypted key shares from the contract...</p>
               </div>
             </>
@@ -218,7 +218,7 @@ export default function ClaimPage() {
           {step === 'decrypt' && (
             <>
               <div className="flex items-center gap-3">
-                <FileText className="w-6 h-6 text-[#0090FF]" />
+                <FileText className="w-6 h-6 text-[#D6FF34]" />
                 <h2 className="text-lg font-medium">Decrypt Documents</h2>
               </div>
               <p className="text-sm text-white/60">
@@ -226,7 +226,7 @@ export default function ClaimPage() {
               </p>
               <button
                 onClick={handleDecrypt}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#0090FF] to-blue-600 text-white font-medium hover:opacity-90"
+                className="inline-flex items-center gap-2 bg-[#D6FF34] text-black rounded-full px-7 py-3.5 text-[13px] font-bold uppercase tracking-[0.96px] hover:opacity-90"
               >
                 <Key className="w-4 h-4" />
                 Decrypt & Download
@@ -249,9 +249,9 @@ export default function ClaimPage() {
                     key={i}
                     href={file.url}
                     download={file.name}
-                    className="flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10"
+                    className="flex items-center gap-3 bg-surface-2 rounded-[16px] p-5 hover:opacity-80 transition-opacity"
                   >
-                    <Download className="w-5 h-5 text-green-400" />
+                    <Download className="w-5 h-5 text-card-mint" />
                     <span className="text-sm text-white">{file.name}</span>
                   </a>
                 ))}

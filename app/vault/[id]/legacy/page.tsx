@@ -117,29 +117,29 @@ export default function LegacyDocumentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black text-white">
+    <div className="min-h-screen bg-black text-white">
       <Header />
 
       <div className="relative max-w-4xl mx-auto px-6 pt-32 pb-14 space-y-8">
-        <Link href={`/vault/${vaultId}`} className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm">
+        <Link href={`/vault/${vaultId}`} className="inline-flex items-center gap-2 text-white/50 hover:text-white text-sm transition-colors">
           <ArrowLeft className="w-4 h-4" />
           Back to Vault
         </Link>
 
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold">Legacy Documents</h1>
-          <p className="text-white/60">
+          <h1 className="text-3xl uppercase font-bold">Legacy Documents</h1>
+          <p className="text-white/50">
             Upload documents that will be accessible to beneficiaries when inheritance is triggered.
             All files are encrypted client-side before upload.
           </p>
         </div>
 
         {/* Security Notice */}
-        <div className="p-4 rounded-xl border border-[#F7931A]/20 bg-[#F7931A]/5 flex items-start gap-3">
-          <Lock className="w-5 h-5 text-[#F7931A] mt-0.5 flex-shrink-0" />
+        <div className="bg-surface-1 rounded-[30px] p-6 border-l-[3px] border-[#D6FF34] flex items-start gap-3">
+          <Lock className="w-5 h-5 text-[#D6FF34] mt-0.5 flex-shrink-0" />
           <div className="text-sm">
             <p className="text-white font-medium">End-to-end encrypted</p>
-            <p className="text-white/60">
+            <p className="text-white/50">
               Documents are encrypted with AES-256-GCM before upload. The encryption key is split
               using Shamir&apos;s Secret Sharing and distributed to beneficiaries. The server never sees plaintext.
             </p>
@@ -147,7 +147,7 @@ export default function LegacyDocumentsPage() {
         </div>
 
         {/* Upload */}
-        <div className="p-6 rounded-2xl border border-dashed border-white/20 bg-white/[0.02] text-center">
+        <div className="bg-surface-1 rounded-[30px] p-10 border-2 border-dashed border-white/20 text-center">
           <input
             ref={fileInputRef}
             type="file"
@@ -161,14 +161,14 @@ export default function LegacyDocumentsPage() {
           >
             {uploading ? (
               <div className="py-8">
-                <div className="w-8 h-8 border-2 border-[#F7931A] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                <p className="text-white/60">Encrypting and uploading...</p>
+                <div className="w-8 h-8 border-2 border-[#D6FF34] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <p className="text-white/50">Encrypting and uploading...</p>
               </div>
             ) : (
-              <div className="py-8">
-                <Upload className="w-10 h-10 text-white/20 mx-auto mb-3" />
-                <p className="text-white/60">Click to upload a document</p>
-                <p className="text-xs text-white/40 mt-1">
+              <div className="py-8 group">
+                <Upload className="w-10 h-10 text-white/20 group-hover:text-[#D6FF34] mx-auto mb-3 transition-colors" />
+                <p className="text-white/50 group-hover:text-[#D6FF34] transition-colors">Click to upload a document</p>
+                <p className="text-xs text-white/30 mt-1">
                   Files are encrypted locally before being stored on IPFS + Filecoin
                 </p>
               </div>
@@ -178,27 +178,27 @@ export default function LegacyDocumentsPage() {
 
         {/* Document List */}
         <div className="space-y-3">
-          <h2 className="text-lg font-medium text-white/80">
+          <h2 className="text-lg uppercase font-bold text-white/80">
             Uploaded Documents ({documents.length})
           </h2>
 
           {documents.length === 0 ? (
             <div className="text-center py-12">
               <FileText className="w-12 h-12 text-white/10 mx-auto mb-3" />
-              <p className="text-white/40 text-sm">No documents uploaded yet</p>
+              <p className="text-white/30 text-sm">No documents uploaded yet</p>
             </div>
           ) : (
             documents.map((doc, i) => (
               <div
                 key={doc.cid}
-                className="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/5"
+                className="flex items-center justify-between bg-surface-2 rounded-[16px] p-5"
               >
                 <div className="flex items-center gap-3">
                   <FileText className="w-5 h-5 text-[#0090FF]" />
                   <div>
                     <p className="text-sm font-medium text-white">{doc.name}</p>
-                    <p className="text-xs text-white/40 font-mono">{doc.cid.slice(0, 30)}...</p>
-                    <p className="text-xs text-white/40">
+                    <p className="font-mono text-xs text-white/45">{doc.cid.slice(0, 30)}...</p>
+                    <p className="text-xs text-white/45">
                       {formatSize(doc.size)} · {new Date(doc.timestamp).toLocaleDateString()}
                     </p>
                   </div>
@@ -208,14 +208,14 @@ export default function LegacyDocumentsPage() {
                     href={`https://w3s.link/ipfs/${doc.cid}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg text-white/40 hover:text-white/60"
+                    className="p-2 rounded-lg text-white/40 hover:text-white/60 transition-colors"
                     title="View on IPFS gateway"
                   >
                     <ExternalLink className="w-4 h-4" />
                   </a>
                   <button
                     onClick={() => removeDocument(i)}
-                    className="p-2 rounded-lg text-red-400/40 hover:text-red-400"
+                    className="p-2 rounded-lg text-red-400/40 hover:text-red-400 transition-colors"
                     title="Remove document"
                   >
                     <Trash2 className="w-4 h-4" />
