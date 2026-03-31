@@ -18,7 +18,7 @@ interface VaultSummary {
 }
 
 export default function DashboardPage() {
-  const { wallet: filWallet } = useFilecoinWallet();
+  const { wallet: filWallet, initializing } = useFilecoinWallet();
   const router = useRouter();
   const [vaults, setVaults] = useState<VaultSummary[]>([]);
   const [loading, setLoading] = useState(false);
@@ -26,14 +26,15 @@ export default function DashboardPage() {
   const isConnected = filWallet.isConnected;
 
   useEffect(() => {
+    if (initializing) return;
     if (!isConnected) {
       router.replace('/');
       return;
     }
-  }, [isConnected, router]);
+  }, [isConnected, initializing, router]);
 
   useEffect(() => {
-    if (!isConnected) return;
+    if (initializing || !isConnected) return;
 
     const fetchVaults = async () => {
       setLoading(true);
@@ -45,7 +46,7 @@ export default function DashboardPage() {
           try {
             const { FVMVaultManager } = await import('@/lib/fvm-vault');
             const { ethers } = await import('ethers');
-            const factoryAddress = process.env.NEXT_PUBLIC_FVM_FACTORY_ADDRESS || '0x6d4E608031Df82593acbF4CD54E85C0a8D79BC9e';
+            const factoryAddress = process.env.NEXT_PUBLIC_FVM_FACTORY_ADDRESS || '0xAAAa62eA507115287feBf936Bd657a7c899A64b2';
             if (factoryAddress) {
               const provider = new ethers.BrowserProvider(window.ethereum!);
               const manager = new FVMVaultManager(provider, factoryAddress);

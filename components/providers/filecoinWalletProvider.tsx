@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react';
 import { BrowserProvider, Signer } from 'ethers';
 import { toast } from 'sonner';
 
@@ -27,6 +27,7 @@ interface FilecoinWalletContextType {
   provider: BrowserProvider | null;
   signer: Signer | null;
   isLoading: boolean;
+  initializing: boolean;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
 }
@@ -47,6 +48,7 @@ interface FilecoinWalletProviderProps {
 
 export const FilecoinWalletProvider: React.FC<FilecoinWalletProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [signer, setSigner] = useState<Signer | null>(null);
   const [wallet, setWallet] = useState<FilecoinWalletContextType['wallet']>({
@@ -55,6 +57,32 @@ export const FilecoinWalletProvider: React.FC<FilecoinWalletProviderProps> = ({ 
     chainId: 0,
     balance: '0',
   });
+
+  // Flag to suppress chain-change handling during intentional connect
+  const isConnectingRef = useRef(false);
+
+  const setupWallet = useCallback(async () => {
+    if (!window.ethereum) return false;
+    try {
+      const browserProvider = new BrowserProvider(window.ethereum);
+      const walletSigner = await browserProvider.getSigner();
+      const address = await walletSigner.getAddress();
+      const balance = await browserProvider.getBalance(address);
+      const network = await browserProvider.getNetwork();
+
+      setProvider(browserProvider);
+      setSigner(walletSigner);
+      setWallet({
+        isConnected: true,
+        address,
+        chainId: Number(network.chainId),
+        balance: (Number(balance) / 1e18).toFixed(4),
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
 
   const switchToCalibration = useCallback(async () => {
     if (!window.ethereum) return false;
@@ -66,7 +94,6 @@ export const FilecoinWalletProvider: React.FC<FilecoinWalletProviderProps> = ({ 
       });
       return true;
     } catch (switchError: any) {
-      // Chain not added yet — add it
       if (switchError.code === 4902) {
         try {
           await window.ethereum.request({
@@ -92,8 +119,8 @@ export const FilecoinWalletProvider: React.FC<FilecoinWalletProviderProps> = ({ 
     }
 
     setIsLoading(true);
+    isConnectingRef.current = true;
     try {
-      // Request accounts
       const accounts = await window.ethereum.request({
         method: 'eth_requestAccounts',
       });
@@ -103,33 +130,23 @@ export const FilecoinWalletProvider: React.FC<FilecoinWalletProviderProps> = ({ 
         return;
       }
 
-      // Switch to Calibration testnet
       const switched = await switchToCalibration();
       if (!switched) return;
 
-      const browserProvider = new BrowserProvider(window.ethereum);
-      const walletSigner = await browserProvider.getSigner();
-      const address = await walletSigner.getAddress();
-      const balance = await browserProvider.getBalance(address);
-      const network = await browserProvider.getNetwork();
-
-      setProvider(browserProvider);
-      setSigner(walletSigner);
-      setWallet({
-        isConnected: true,
-        address,
-        chainId: Number(network.chainId),
-        balance: (Number(balance) / 1e18).toFixed(4),
-      });
-
-      toast.success(`Connected to Filecoin Calibration: ${address.slice(0, 6)}...${address.slice(-4)}`);
+      const success = await setupWallet();
+      if (success) {
+        const address = accounts[0];
+        toast.success(`Connected to Filecoin Calibration: ${address.slice(0, 6)}...${address.slice(-4)}`);
+      }
     } catch (error) {
       console.error('Filecoin wallet connection error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to connect wallet');
     } finally {
       setIsLoading(false);
+      // Small delay so any pending chainChanged events from switchToCalibration are ignored
+      setTimeout(() => { isConnectingRef.current = false; }, 1000);
     }
-  }, [switchToCalibration]);
+  }, [switchToCalibration, setupWallet]);
 
   const disconnectWallet = useCallback(() => {
     setProvider(null);
@@ -143,23 +160,45 @@ export const FilecoinWalletProvider: React.FC<FilecoinWalletProviderProps> = ({ 
     toast.success('Filecoin wallet disconnected');
   }, []);
 
+  // Auto-reconnect if MetaMask is already connected
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.ethereum) {
+      setInitializing(false);
+      return;
+    }
+
+    (async () => {
+      try {
+        const accounts = await window.ethereum!.request({ method: 'eth_accounts' });
+        if (accounts && accounts.length > 0) {
+          await setupWallet();
+        }
+      } catch (err) {
+        console.warn('Auto-reconnect failed:', err);
+      } finally {
+        setInitializing(false);
+      }
+    })();
+  }, [setupWallet]);
+
   // Listen for account/chain changes
   useEffect(() => {
     if (typeof window === 'undefined' || !window.ethereum) return;
 
     const handleAccountsChanged = (accounts: string[]) => {
+      if (isConnectingRef.current) return;
       if (accounts.length === 0) {
         disconnectWallet();
-      } else if (wallet.isConnected) {
-        setWallet(prev => ({ ...prev, address: accounts[0] }));
+      } else {
+        // Re-setup wallet with new account
+        setupWallet();
       }
     };
 
     const handleChainChanged = () => {
-      // Reload on chain change to reset provider state
-      if (wallet.isConnected) {
-        window.location.reload();
-      }
+      if (isConnectingRef.current) return;
+      // Re-setup wallet with new chain instead of reloading
+      setupWallet();
     };
 
     window.ethereum.on('accountsChanged', handleAccountsChanged);
@@ -169,11 +208,11 @@ export const FilecoinWalletProvider: React.FC<FilecoinWalletProviderProps> = ({ 
       window.ethereum?.removeListener('accountsChanged', handleAccountsChanged);
       window.ethereum?.removeListener('chainChanged', handleChainChanged);
     };
-  }, [wallet.isConnected, disconnectWallet]);
+  }, [disconnectWallet, setupWallet]);
 
   return (
     <FilecoinWalletContext.Provider
-      value={{ wallet, provider, signer, isLoading, connectWallet, disconnectWallet }}
+      value={{ wallet, provider, signer, isLoading, initializing, connectWallet, disconnectWallet }}
     >
       {children}
     </FilecoinWalletContext.Provider>

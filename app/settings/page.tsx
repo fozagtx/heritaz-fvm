@@ -7,12 +7,13 @@ import { Settings, Wallet, CheckCircle2, XCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function SettingsPage() {
-  const { wallet: filWallet, connectWallet: connectFil, disconnectWallet: disconnectFil } = useFilecoinWallet();
+  const { wallet: filWallet, connectWallet: connectFil, disconnectWallet: disconnectFil, initializing } = useFilecoinWallet();
   const router = useRouter();
 
   useEffect(() => {
+    if (initializing) return;
     if (!filWallet.isConnected) router.replace('/');
-  }, [filWallet.isConnected, router]);
+  }, [filWallet.isConnected, initializing, router]);
 
   return (
     <div className="min-h-screen bg-black text-white">

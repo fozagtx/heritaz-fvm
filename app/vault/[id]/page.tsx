@@ -67,7 +67,7 @@ export default function VaultDetailPage() {
       const { FVMVaultManager } = await import('@/lib/fvm-vault');
       const { ethers } = await import('ethers');
       const provider = new ethers.BrowserProvider(window.ethereum!);
-      const factoryAddress = process.env.NEXT_PUBLIC_FVM_FACTORY_ADDRESS || '0x6d4E608031Df82593acbF4CD54E85C0a8D79BC9e';
+      const factoryAddress = process.env.NEXT_PUBLIC_FVM_FACTORY_ADDRESS || '0xAAAa62eA507115287feBf936Bd657a7c899A64b2';
       const manager = new FVMVaultManager(provider, factoryAddress, signer);
 
       const result = await manager.checkIn(vaultId);

@@ -42,7 +42,7 @@ Just code running on Filecoin.
 
 | Contract | Address | Explorer |
 |----------|---------|----------|
-| HeritazFactory | `0x6d4E608031Df82593acbF4CD54E85C0a8D79BC9e` | [Blockscout](https://filecoin-testnet.blockscout.com/address/0x6d4E608031Df82593acbF4CD54E85C0a8D79BC9e) |
+| HeritazFactory | `0xAAAa62eA507115287feBf936Bd657a7c899A64b2` | [Blockscout](https://filecoin-testnet.blockscout.com/address/0xAAAa62eA507115287feBf936Bd657a7c899A64b2) |
 | Deployer | `0xDe5df44009FD2E13bBAcfED2b8e3833B5Dc4Bf21` | [Blockscout](https://filecoin-testnet.blockscout.com/address/0xDe5df44009FD2E13bBAcfED2b8e3833B5Dc4Bf21) |
 
 **Network Details:**

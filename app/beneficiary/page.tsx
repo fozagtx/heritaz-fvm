@@ -16,12 +16,13 @@ interface BeneficiaryVault {
 }
 
 export default function BeneficiaryPage() {
-  const { wallet: filWallet } = useFilecoinWallet();
+  const { wallet: filWallet, initializing } = useFilecoinWallet();
   const router = useRouter();
   const [vaults, setVaults] = useState<BeneficiaryVault[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (initializing) return;
     if (!filWallet.isConnected) {
       router.replace('/');
       return;
@@ -41,7 +42,7 @@ export default function BeneficiaryPage() {
     };
 
     fetchBeneficiaryVaults();
-  }, [filWallet.isConnected]);
+  }, [filWallet.isConnected, initializing, router]);
 
   return (
     <div className="min-h-screen bg-black text-white">
